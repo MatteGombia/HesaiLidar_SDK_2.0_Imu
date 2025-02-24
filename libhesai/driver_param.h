@@ -143,10 +143,12 @@ typedef struct InputParam
   int speed = -1;
 
   bool send_packet_ros;
+  bool send_imu_ros;
   bool send_point_cloud_ros;
   std::string frame_id;
 
   std::string ros_send_packet_topic = NULL_TOPIC;
+  std::string ros_send_imu_topic = NULL_TOPIC;
   std::string ros_send_point_topic = NULL_TOPIC;
   std::string ros_send_packet_loss_topic = NULL_TOPIC; 
   std::string ros_send_ptp_topic = NULL_TOPIC;

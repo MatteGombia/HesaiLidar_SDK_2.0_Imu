@@ -38,6 +38,7 @@ class HesaiLidarSdk
 {
 private:
   std::thread *runing_thread_ptr_;
+  std::function<void(const UdpPacket&)> imu_cb_;
   std::function<void(const UdpFrame_t&, double)> pkt_cb_;
   std::function<void(const LidarDecodedFrame<T_Point>&)> point_cloud_cb_;
   std::function<void(const u8Array_t&)> correction_cb_;
@@ -194,6 +195,11 @@ public:
       //do not compute xyzi of points if enable packet_loss_tool_
       // if(packet_loss_tool_ == true) continue;
 
+      //Publish Imu for every packet
+      if(imu_cb_) {
+        imu_cb_(packet);
+      }
+
       //one frame is receive completely, split frame
       if(lidar_ptr_->frame_.scan_complete) {
         // If it's not a timeout split frame, it will be one more packet
@@ -286,6 +292,11 @@ public:
   // assign callback fuction
   void RegRecvCallback(const std::function<void(const UdpFrame_t&, double)>& callback) {
     pkt_cb_ = callback;
+  }
+
+  // assign callback fuction
+  void RegRecvCallback(const std::function<void(const UdpPacket&)>& callback) {
+    imu_cb_ = callback;
   }
 
   // assign callback fuction
