@@ -152,6 +152,7 @@ public:
     lidar_ptr_->frame_.config.fov_start = lidar_ptr_->fov_start_;
     lidar_ptr_->frame_.config.fov_end = lidar_ptr_->fov_end_;
     uint32_t packet_index = 0;
+    uint32_t counter = 0;
     // uint32_t start = GetMicroTickCount();
     UdpPacket packet;
     FaultMessageInfo fault_message_info;
@@ -199,6 +200,14 @@ public:
       if(imu_cb_) {
         imu_cb_(packet);
       }
+      
+      if(counter > 1000){
+        lidar_ptr_->frame_.scan_complete = true;
+        counter = 0;
+      }else{
+        counter++;
+      }
+        
 
       //one frame is receive completely, split frame
       if(lidar_ptr_->frame_.scan_complete) {
@@ -209,8 +218,8 @@ public:
         while(!lidar_ptr_->ComputeXYZIComplete(packet_index)) std::this_thread::sleep_for(std::chrono::microseconds(100));
         // uint32_t end =  GetMicroTickCount();
         //log info, display frame message
-        if (lidar_ptr_->frame_.points_num > kMinPointsOfOneFrame) {
-          // LogInfo("frame:%d   points:%u  packet:%d  time:%lf %lf",lidar_ptr_->frame_.frame_index,  lidar_ptr_->frame_.points_num, packet_index, lidar_ptr_->frame_.points[0].timestamp, lidar_ptr_->frame_.points[lidar_ptr_->frame_.points_num - 1].timestamp) ;
+        if (true/*lidar_ptr_->frame_.points_num > kMinPointsOfOneFrame*/) {
+          //LogInfo("frame:%d   points:%u  packet:%d  time:%lf %lf",lidar_ptr_->frame_.frame_index,  lidar_ptr_->frame_.points_num, packet_index, lidar_ptr_->frame_.points[0].timestamp, lidar_ptr_->frame_.points[lidar_ptr_->frame_.points_num - 1].timestamp) ;
 
           //publish point cloud topic
           if(point_cloud_cb_) point_cloud_cb_(lidar_ptr_->frame_);
